@@ -1,9 +1,12 @@
 import jieba
 import jieba.analyse
 # 用于分词
-import os
 from sklearn.metrics.pairwise import cosine_similarity
 # sklearn中的 cosine_similarity 可直接计算余弦相似度
+import sys
+
+
+# 用于读取命令行参数
 
 
 class CosineSimilarity(object):
@@ -43,12 +46,12 @@ class CosineSimilarity(object):
             # 除0处理
 
     @staticmethod
-    def constructHash(keywords):    # 构造哈希表
+    def constructHash(keywords):  # 构造哈希表
         dictionaries = {}
         hash_value = 0
-        for keyword in keywords:    # 哈希表赋值
+        for keyword in keywords:  # 哈希表赋值
             dictionaries[keyword] = hash_value
-            hash_value += 1     # 每个词对应的哈希值从数字0开始递增
+            hash_value += 1  # 每个词对应的哈希值从数字0开始递增
         return dictionaries
 
     def main(self):
@@ -68,16 +71,24 @@ class CosineSimilarity(object):
 
 
 if __name__ == '__main__':
-
-    root = "E:\\python file\\sim_0.8"
-    fileName = os.listdir(root)  # 得到当前目录下所有的文件名
-    with open(root + '\\' + fileName[0], encoding='UTF-8') as fp:
-        orig_text = fp.read()
-        seg = [i for i in jieba.cut(orig_text, cut_all=True) if i != '']
-    topK = int(len(seg) / 8)
-    for i in range(1, 10):
-        with open(root + '\\' + fileName[i], encoding='UTF-8') as fp:
+    # 命令行输入绝对路径
+    # 读入源文本、抄袭文本 计算topK
+    try:
+        with open(sys.argv[1], "r", encoding='UTF-8') as fp:
+            orig_text = fp.read()
+            seg = [i for i in jieba.cut(orig_text, cut_all=True) if i != '']
+        topK = int(len(seg) / 8)
+        with open(sys.argv[2], "r", encoding='UTF-8') as fp:
             copy_text = fp.read()
-            similarity = CosineSimilarity(orig_text, copy_text)
-            similarity = similarity.main()
-            print(fileName[i] + ' 相似度: %.2f%%' % (similarity * 100))
+    except Exception as e:
+        print(e)
+        topK = 0
+    similarity = CosineSimilarity(orig_text, copy_text)
+    # 所计算的相似度按题目要求保留两位小数
+    similarity = round(similarity.main(), 2)
+    # 将相似度写入输出文本
+    try:
+        with open(sys.argv[3], "w+", encoding='UTF-8') as fp:
+            fp.write(str(similarity))
+    except Exception as e:
+        print(e)

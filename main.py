@@ -1,7 +1,9 @@
 import jieba
 import jieba.analyse
+# 用于分词
 import os
 from sklearn.metrics.pairwise import cosine_similarity
+# sklearn中的 cosine_similarity 可直接计算余弦相似度
 
 
 class CosineSimilarity(object):
@@ -27,32 +29,42 @@ class CosineSimilarity(object):
 
     @staticmethod
     def calculate(s1_code, s2_code):
-        sample = [s1_code, s2_code]
-        sim = cosine_similarity(sample)
-        # 用scikit-learn自带的余弦相似度计算
-        # 返回的数组[0][0]为 s1 与 s1 的相似度
-        # [0][1]为 s1 与 s2 的相似度
-        return sim[0][1]
+        try:
+            sample = [s1_code, s2_code]
+            sim = cosine_similarity(sample)
+            # 用scikit-learn自带的余弦相似度计算
+            # 对称矩阵sim
+            # 返回的数组sim[0][0]为 s1 与 s1 的相似度
+            # sim[0][1]为 s1 与 s2 的相似度 即sim[x][y]为x与y的相似度
+            return sim[0][1]
+        except Exception as e:
+            print(e)
+            return 0.0
+            # 除0处理
 
-    def main(self):
-
+    @staticmethod
+    def constructHash(keywords):    # 构造哈希表
         dictionaries = {}
         hash_value = 0
-        # 初始化哈希表
+        for keyword in keywords:    # 哈希表赋值
+            dictionaries[keyword] = hash_value
+            hash_value += 1     # 每个词对应的哈希值从数字0开始递增
+        return dictionaries
+
+    def main(self):
         keywords1 = self.extractKeyword(self.s1)
         keywords2 = self.extractKeyword(self.s2)
         #   分别提取文本的关键词
         keywords = set(keywords1).union(set(keywords2))
         #   set去重
         #   关键词取并
-        for keyword in keywords:
-            dictionaries[keyword] = hash_value
-            hash_value += 1
+        dictionaries = self.constructHash(keywords)
         s1_code = self.oneHotCode(dictionaries, keywords1)
         s2_code = self.oneHotCode(dictionaries, keywords2)
         #   编码
         sim_value = self.calculate(s1_code, s2_code)
         return sim_value
+        # 返回相似度
 
 
 if __name__ == '__main__':

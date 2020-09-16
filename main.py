@@ -4,8 +4,6 @@ import jieba.analyse
 from sklearn.metrics.pairwise import cosine_similarity
 # sklearn中的 cosine_similarity 可直接计算余弦相似度
 import sys
-
-
 # 用于读取命令行参数
 
 
@@ -64,7 +62,7 @@ class CosineSimilarity(object):
         dictionaries = self.constructHash(keywords)
         s1_code = self.oneHotCode(dictionaries, keywords1)
         s2_code = self.oneHotCode(dictionaries, keywords2)
-        #   编码
+        #   oneHot编码
         sim_value = self.calculate(s1_code, s2_code)
         return sim_value
         # 返回相似度

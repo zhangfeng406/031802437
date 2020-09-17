@@ -33,15 +33,15 @@ class CosineSimilarity(object):
         sq1 = 0
         sq2 = 0
         for i in range(len(dictionaries)):
-            sum += s1_code[i] * s2_code[i]
-            sq1 += pow(s1_code[i], 2)
+            sum += s1_code[i] * s2_code[i]  # 余弦公式的分子部分
+            sq1 += pow(s1_code[i], 2)   # 余弦公式的分母部分
             sq2 += pow(s2_code[i], 2)
 
         try:
-            re = float(sum) / (math.sqrt(sq1) * math.sqrt(sq2))
-            result = round(re, 2)
+            re = float(sum) / (math.sqrt(sq1) * math.sqrt(sq2)) # 求解余弦值
+            result = round(re, 2)   # 精确到小数点后2位
         except ZeroDivisionError:
-            result = 0.0
+            result = 0.00
         return result
 
     @staticmethod

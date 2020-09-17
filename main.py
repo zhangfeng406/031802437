@@ -1,8 +1,7 @@
 import jieba
 import jieba.analyse
 # 用于分词
-from sklearn.metrics.pairwise import cosine_similarity
-# sklearn中的 cosine_similarity 可直接计算余弦相似度
+import math
 import sys
 # 用于读取命令行参数
 
@@ -29,19 +28,21 @@ class CosineSimilarity(object):
         return vector
 
     @staticmethod
-    def calculate(s1_code, s2_code):
+    def calculate(dictionaries,s1_code, s2_code):
+        sum = 0
+        sq1 = 0
+        sq2 = 0
+        for i in range(len(dictionaries)):
+            sum += s1_code[i] * s2_code[i]
+            sq1 += pow(s1_code[i], 2)
+            sq2 += pow(s2_code[i], 2)
+
         try:
-            sample = [s1_code, s2_code]
-            sim = cosine_similarity(sample)
-            # 用scikit-learn自带的余弦相似度计算
-            # 对称矩阵sim
-            # 返回的数组sim[0][0]为 s1 与 s1 的相似度
-            # sim[0][1]为 s1 与 s2 的相似度 即sim[x][y]为x与y的相似度
-            return sim[0][1]
-        except Exception as e:
-            print(e)
-            return 0.0
-            # 除0处理
+            re = float(sum) / (math.sqrt(sq1) * math.sqrt(sq2))
+            result = round(re, 2)
+        except ZeroDivisionError:
+            result = 0.0
+        return result
 
     @staticmethod
     def constructHash(keywords):  # 构造哈希表
@@ -63,7 +64,8 @@ class CosineSimilarity(object):
         s1_code = self.oneHotCode(dictionaries, keywords1)
         s2_code = self.oneHotCode(dictionaries, keywords2)
         #   oneHot编码
-        sim_value = self.calculate(s1_code, s2_code)
+        # 余弦相似度计算
+        sim_value = self.calculate(dictionaries, s1_code, s2_code)
         return sim_value
         # 返回相似度
 
